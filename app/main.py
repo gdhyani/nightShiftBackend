@@ -3,6 +3,8 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.candles import router as candles_router
+from app.api.store import router as store_router
 from app.core.database import engine
 
 
@@ -26,6 +28,9 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    app.include_router(candles_router)
+    app.include_router(store_router)
 
     return app
 
