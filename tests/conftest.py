@@ -27,9 +27,12 @@ async def setup_test_db():
 
 @pytest.fixture
 async def db_session() -> AsyncGenerator[AsyncSession, None]:
-    async with test_session_factory() as session:
+    async with test_engine.connect() as conn:
+        trans = await conn.begin()
+        session = AsyncSession(bind=conn, expire_on_commit=False)
         yield session
-        await session.rollback()
+        await session.close()
+        await trans.rollback()
 
 
 @pytest.fixture
