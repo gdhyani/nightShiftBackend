@@ -1,16 +1,71 @@
+import asyncio
+import logging
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.candles import router as candles_router
+from app.api.indicators import router as indicators_router
 from app.api.store import router as store_router
-from app.core.database import engine
+from app.api.ws import router as ws_router, set_manager
+from app.core.config import settings
+from app.core.database import async_session, engine
+from app.core.ws_manager import ConnectionManager
+from app.services.candle_ingestor import CandleIngestor
+from app.services.oanda import OandaService
+from app.services.store_calculator import StoreCalculator
+from app.services.store_updater import StoreUpdater
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Startup
+    ws_manager = ConnectionManager()
+    set_manager(ws_manager)
+    app.state.ws_manager = ws_manager
+
+    ingest_task = None
+    if settings.oanda_api_key:
+        oanda = OandaService(
+            api_key=settings.oanda_api_key,
+            account_id=settings.oanda_account_id,
+            api_url=settings.oanda_api_url,
+        )
+        ingestor = CandleIngestor(oanda=oanda)
+        calculator = StoreCalculator()
+        updater = StoreUpdater(calculator=calculator)
+
+        async def ingest_and_update_loop():
+            while True:
+                try:
+                    for symbol in settings.watchlist_symbols:
+                        for tf in settings.timeframes_list:
+                            async with async_session() as session:
+                                await ingestor.ingest_once(session, symbol, tf)
+                            async with async_session() as session:
+                                indicators = await updater.update_snapshot(session, symbol, tf)
+                            if indicators:
+                                await ws_manager.broadcast("store_updated", {
+                                    "channel": "store_updated",
+                                    "symbol": symbol,
+                                    "timeframe": tf,
+                                    "data": indicators,
+                                })
+                except Exception as e:
+                    logger.error(f"Ingestion cycle error: {e}")
+                await asyncio.sleep(settings.ingest_interval)
+
+        ingest_task = asyncio.create_task(ingest_and_update_loop())
+        logger.info("Background ingestion started")
+
     yield
+
+    # Shutdown
+    if ingest_task:
+        ingest_task.cancel()
     await engine.dispose()
 
 
@@ -31,6 +86,8 @@ def create_app() -> FastAPI:
 
     app.include_router(candles_router)
     app.include_router(store_router)
+    app.include_router(indicators_router)
+    app.include_router(ws_router)
 
     return app
 
