@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.agents import router as agents_router
 from app.api.candles import router as candles_router
 from app.api.indicators import router as indicators_router
 from app.api.store import router as store_router
@@ -61,9 +62,18 @@ async def lifespan(app: FastAPI):
         ingest_task = asyncio.create_task(ingest_and_update_loop())
         logger.info("Background ingestion started")
 
+    agent_runner = None
+    if settings.llm_api_key:
+        from app.services.agent_runner import AgentRunner
+        agent_runner = AgentRunner(session_factory=async_session, ws_manager=ws_manager)
+        agent_runner.start_all()
+        logger.info("Agent runner started")
+
     yield
 
     # Shutdown
+    if agent_runner:
+        agent_runner.stop_all()
     if ingest_task:
         ingest_task.cancel()
     await engine.dispose()
@@ -84,6 +94,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
 
+    app.include_router(agents_router)
     app.include_router(candles_router)
     app.include_router(store_router)
     app.include_router(indicators_router)
