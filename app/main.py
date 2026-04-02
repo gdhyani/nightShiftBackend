@@ -9,6 +9,8 @@ from app.api.agents import router as agents_router
 from app.api.candles import router as candles_router
 from app.api.indicators import router as indicators_router
 from app.api.store import router as store_router
+from app.api.strategies import router as strategies_router
+from app.api.trades import router as trades_router
 from app.api.ws import router as ws_router, set_manager
 from app.core.config import settings
 from app.core.database import async_session, engine
@@ -69,9 +71,18 @@ async def lifespan(app: FastAPI):
         agent_runner.start_all()
         logger.info("Agent runner started")
 
+    strategy_runner_svc = None
+    if settings.llm_api_key:
+        from app.services.strategy_runner import StrategyRunner as StratRunner
+        strategy_runner_svc = StratRunner(session_factory=async_session, ws_manager=ws_manager)
+        await strategy_runner_svc.start_strategies()
+        logger.info("Strategy runner started")
+
     yield
 
     # Shutdown
+    if strategy_runner_svc:
+        strategy_runner_svc.stop_all()
     if agent_runner:
         agent_runner.stop_all()
     if ingest_task:
@@ -98,6 +109,8 @@ def create_app() -> FastAPI:
     app.include_router(candles_router)
     app.include_router(store_router)
     app.include_router(indicators_router)
+    app.include_router(strategies_router)
+    app.include_router(trades_router)
     app.include_router(ws_router)
 
     return app
