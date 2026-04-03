@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from contextlib import asynccontextmanager
 
@@ -20,10 +19,8 @@ from app.api.ws import set_manager
 from app.core.config import settings
 from app.core.database import async_session, engine
 from app.core.ws_manager import ConnectionManager
-from app.services.candle_ingestor import CandleIngestor
-from app.services.oanda import OandaService
-from app.services.store_calculator import StoreCalculator
-from app.services.store_updater import StoreUpdater
+
+# Note: candle ingestion removed — rebuilt in SP2 with Upstox
 
 logger = logging.getLogger(__name__)
 
@@ -34,40 +31,6 @@ async def lifespan(app: FastAPI):
     ws_manager = ConnectionManager()
     set_manager(ws_manager)
     app.state.ws_manager = ws_manager
-
-    ingest_task = None
-    if settings.oanda_api_key:
-        oanda = OandaService(
-            api_key=settings.oanda_api_key,
-            account_id=settings.oanda_account_id,
-            api_url=settings.oanda_api_url,
-        )
-        ingestor = CandleIngestor(oanda=oanda)
-        calculator = StoreCalculator()
-        updater = StoreUpdater(calculator=calculator)
-
-        async def ingest_and_update_loop():
-            while True:
-                try:
-                    for symbol in settings.watchlist_symbols:
-                        for tf in settings.timeframes_list:
-                            async with async_session() as session:
-                                await ingestor.ingest_once(session, symbol, tf)
-                            async with async_session() as session:
-                                indicators = await updater.update_snapshot(session, symbol, tf)
-                            if indicators:
-                                await ws_manager.broadcast("store_updated", {
-                                    "channel": "store_updated",
-                                    "symbol": symbol,
-                                    "timeframe": tf,
-                                    "data": indicators,
-                                })
-                except Exception as e:
-                    logger.error(f"Ingestion cycle error: {e}")
-                await asyncio.sleep(settings.ingest_interval)
-
-        ingest_task = asyncio.create_task(ingest_and_update_loop())
-        logger.info("Background ingestion started")
 
     agent_runner = None
     if settings.llm_api_key:
@@ -93,8 +56,6 @@ async def lifespan(app: FastAPI):
         strategy_runner_svc.stop_all()
     if agent_runner:
         agent_runner.stop_all()
-    if ingest_task:
-        ingest_task.cancel()
     await engine.dispose()
 
 

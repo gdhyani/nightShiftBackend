@@ -7,19 +7,34 @@ class Settings(BaseSettings):
     )
 
     # Database
-    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/nightshift"
+    database_url: str = (
+        "postgresql+asyncpg://postgres:postgres@localhost:5432/nightshift"
+    )
 
-    # OANDA
-    oanda_api_key: str = ""
-    oanda_account_id: str = ""
-    oanda_api_url: str = "https://api-fxpractice.oanda.com"
+    # Upstox API
+    upstox_client_id: str = ""
+    upstox_client_secret: str = ""
+    upstox_redirect_uri: str = (
+        "http://localhost:8000/api/auth/upstox/callback"
+    )
+    upstox_notifier_url: str = (
+        "http://localhost:8000/api/webhooks/upstox/token"
+    )
+    upstox_sandbox_token: str = ""
+    upstox_api_base_url: str = "https://api.upstox.com"
+
+    # Trading
+    default_trading_mode: str = "paper"
+    token_encryption_key: str = ""
 
     # Ingestion
-    watchlist: str = "EUR_USD,GBP_USD,USD_JPY"
+    watchlist: str = (
+        "NSE_EQ|INE848E01016,NSE_EQ|INE669E01016,NSE_EQ|INE002A01018"
+    )
     ingest_interval: int = 60
-    ingest_timeframes: str = "M5,M15,H1,H4,D"
+    ingest_timeframes: str = "1,5,15,60,day"
 
-    # LLM (self-hosted, OpenAI-compatible)
+    # LLM
     llm_api_url: str = "http://localhost:8080/v1"
     llm_api_key: str = ""
     llm_model_name: str = "default"

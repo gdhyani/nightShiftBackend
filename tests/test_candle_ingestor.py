@@ -1,51 +1,44 @@
 from datetime import datetime, timezone
-from unittest.mock import AsyncMock
 
 import pytest
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
 from app.models import Candle
 from app.services.candle_ingestor import CandleIngestor
 
-
 MOCK_CANDLES = [
     {
-        "symbol": "EUR_USD",
-        "timeframe": "H1",
+        "symbol": "NSE_EQ|INE848E01016",
+        "timeframe": "60",
         "timestamp": datetime(2026, 3, 30, 10, 0, 0, tzinfo=timezone.utc),
-        "open": 1.08, "high": 1.085, "low": 1.078, "close": 1.084, "volume": 1000,
+        "open": 2450.0, "high": 2465.0, "low": 2445.0, "close": 2460.0, "volume": 100000,
     },
     {
-        "symbol": "EUR_USD",
-        "timeframe": "H1",
+        "symbol": "NSE_EQ|INE848E01016",
+        "timeframe": "60",
         "timestamp": datetime(2026, 3, 30, 11, 0, 0, tzinfo=timezone.utc),
-        "open": 1.084, "high": 1.087, "low": 1.082, "close": 1.086, "volume": 1200,
+        "open": 2460.0, "high": 2470.0, "low": 2455.0, "close": 2468.0, "volume": 120000,
     },
 ]
 
 
-@pytest.fixture
-def mock_oanda():
-    service = AsyncMock()
-    service.fetch_candles = AsyncMock(return_value=MOCK_CANDLES)
-    return service
-
-
-async def test_ingest_once_inserts_candles(db_session, mock_oanda):
-    ingestor = CandleIngestor(oanda=mock_oanda)
-    count = await ingestor.ingest_once(db_session, "EUR_USD", "H1")
-    assert count == 2
-    result = await db_session.execute(select(Candle).where(Candle.symbol == "EUR_USD"))
-    candles = result.scalars().all()
-    assert len(candles) == 2
-
-
-async def test_ingest_once_handles_duplicates(db_session, mock_oanda):
-    ingestor = CandleIngestor(oanda=mock_oanda)
-    await ingestor.ingest_once(db_session, "EUR_USD", "H1")
-    count = await ingestor.ingest_once(db_session, "EUR_USD", "H1")
-    assert count == 2
+async def test_ingest_candles_inserts(db_session):
+    ingestor = CandleIngestor()
+    inserted = await ingestor.ingest_candles(db_session, MOCK_CANDLES)
+    assert inserted == 2
     result = await db_session.execute(
-        select(func.count()).select_from(Candle).where(Candle.symbol == "EUR_USD")
+        select(Candle).where(Candle.symbol == "NSE_EQ|INE848E01016")
+    )
+    assert len(result.scalars().all()) == 2
+
+
+async def test_ingest_candles_handles_duplicates(db_session):
+    ingestor = CandleIngestor()
+    await ingestor.ingest_candles(db_session, MOCK_CANDLES)
+    inserted = await ingestor.ingest_candles(db_session, MOCK_CANDLES)
+    assert inserted == 0
+    result = await db_session.execute(
+        select(func.count()).select_from(Candle)
+        .where(Candle.symbol == "NSE_EQ|INE848E01016")
     )
     assert result.scalar() == 2
