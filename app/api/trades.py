@@ -3,7 +3,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
-from app.models import Trade, TradeSchema, Position, PositionSchema
+from app.models import Position, PositionSchema, Trade, TradeSchema
 
 router = APIRouter(tags=["trades"])
 

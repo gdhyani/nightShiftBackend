@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models import Trade, Position
+from app.models import Position, Trade
 
 logger = logging.getLogger(__name__)
 

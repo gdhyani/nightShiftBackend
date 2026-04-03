@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import Any
 
 from pydantic import BaseModel
-from sqlalchemy import Boolean, DateTime, Integer, JSON, String
+from sqlalchemy import JSON, Boolean, DateTime, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base

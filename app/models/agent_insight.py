@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Any
 
 from pydantic import BaseModel
-from sqlalchemy import DateTime, Float, Index, Integer, String, JSON
+from sqlalchemy import JSON, DateTime, Float, Index, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base

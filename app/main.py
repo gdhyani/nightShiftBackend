@@ -11,7 +11,8 @@ from app.api.indicators import router as indicators_router
 from app.api.store import router as store_router
 from app.api.strategies import router as strategies_router
 from app.api.trades import router as trades_router
-from app.api.ws import router as ws_router, set_manager
+from app.api.ws import router as ws_router
+from app.api.ws import set_manager
 from app.core.config import settings
 from app.core.database import async_session, engine
 from app.core.ws_manager import ConnectionManager
