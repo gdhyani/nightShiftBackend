@@ -90,12 +90,22 @@ class StrategyRunner:
                 logger.error(f"Strategy loop error for id={strategy_id}: {e}")
                 await asyncio.sleep(60)
 
-    async def start_strategies(self) -> None:
-        async with self._session_factory() as session:
-            result = await session.execute(
-                select(Strategy).where(Strategy.enabled.is_(True))
-            )
-            strategies = result.scalars().all()
+    async def start_strategies(self, retries: int = 3, delay: float = 5.0) -> None:
+        strategies = []
+        for attempt in range(retries):
+            try:
+                async with self._session_factory() as session:
+                    result = await session.execute(
+                        select(Strategy).where(Strategy.enabled.is_(True))
+                    )
+                    strategies = result.scalars().all()
+                break
+            except Exception as e:
+                logger.warning(f"start_strategies attempt {attempt + 1}/{retries} failed: {e}")
+                if attempt < retries - 1:
+                    await asyncio.sleep(delay)
+                else:
+                    raise
         for strategy in strategies:
             task = asyncio.create_task(self.run_strategy_loop(strategy.id))
             self._tasks.append(task)

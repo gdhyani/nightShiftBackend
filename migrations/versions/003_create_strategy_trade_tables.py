@@ -21,7 +21,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("name", sa.String(length=100), nullable=False, unique=True),
         sa.Column("symbols", sa.String(length=500), nullable=False),
-        sa.Column("enabled", sa.Boolean(), nullable=False, server_default=sa.text("1")),
+        sa.Column("enabled", sa.Boolean(), nullable=False, server_default=sa.text("true")),
         sa.Column("schedule_interval", sa.Integer(), nullable=False, server_default=sa.text("1800")),
         sa.Column("event_triggers", sa.String(length=500), nullable=True),
         sa.Column("pipeline_config", sa.JSON(), nullable=False),

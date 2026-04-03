@@ -31,7 +31,7 @@ class ReviewRunner:
 
         # Step 3: Chat report (LLM-based)
         report_data = await chat_reporter.run(performance, review)
-        logger.info(f"Chat report generated")
+        logger.info("Chat report generated")
 
         # Save daily report to DB
         async with self.session_factory() as session:

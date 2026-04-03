@@ -37,8 +37,14 @@ def upgrade() -> None:
         unique=True,
     )
 
-    # TimescaleDB hypertable
-    op.execute("SELECT create_hypertable('candles', 'timestamp', if_not_exists => TRUE);")
+    # TimescaleDB hypertable (skip if TimescaleDB not installed)
+    op.execute("""
+        DO $$ BEGIN
+            PERFORM create_hypertable('candles', 'timestamp', if_not_exists => TRUE);
+        EXCEPTION WHEN undefined_function THEN
+            RAISE NOTICE 'TimescaleDB not available, skipping hypertable creation';
+        END $$;
+    """)
 
     op.create_table(
         "indicators",
