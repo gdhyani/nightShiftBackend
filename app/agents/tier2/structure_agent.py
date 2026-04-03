@@ -8,14 +8,64 @@ AGENT_NAME = "structure_agent"
 INSIGHT_TYPE = "structure"
 TTL_MINUTES = 120
 
-SYSTEM_PROMPT = """You are a market structure agent for the NightShift trading platform.
-Track market structure across timeframes -- BOS, CHoCH, swing points, trend shifts.
-Respond with JSON: {"h1_structure": "bullish"|"bearish"|"ranging", "h4_structure": "bullish"|"bearish"|"ranging", "last_bos": {"price": 1.0880, "timeframe": "H1", "direction": "bullish"}|null, "last_choch": null, "swing_high": 1.0920, "swing_low": 1.0830}"""
+SYSTEM_PROMPT = (
+    "You are a market structure agent for the NightShift "
+    "trading platform.\n"
+    "Track market structure across timeframes -- BOS, CHoCH, "
+    "swing points, trend shifts.\n"
+    'Respond with JSON: {"h1_structure": '
+    '"bullish"|"bearish"|"ranging", '
+    '"h4_structure": "bullish"|"bearish"|"ranging", '
+    '"last_bos": {"price": 1.0880, "timeframe": "H1", '
+    '"direction": "bullish"}|null, "last_choch": null, '
+    '"swing_high": 1.0920, "swing_low": 1.0830}'
+)
 
 TOOLS = [
-    {"type": "function", "function": {"name": "read_candles", "description": "Read candles", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}, "timeframe": {"type": "string"}, "count": {"type": "integer", "default": 100}}, "required": ["symbol", "timeframe"]}}},
-    {"type": "function", "function": {"name": "read_store", "description": "Read store snapshot", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}}, "required": ["symbol"]}}},
-    {"type": "function", "function": {"name": "read_skill", "description": "Read a SKILL.md file", "parameters": {"type": "object", "properties": {"skill_path": {"type": "string"}}, "required": ["skill_path"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "read_candles",
+            "description": "Read candles",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                    "timeframe": {"type": "string"},
+                    "count": {"type": "integer", "default": 100},
+                },
+                "required": ["symbol", "timeframe"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_store",
+            "description": "Read store snapshot",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                },
+                "required": ["symbol"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_skill",
+            "description": "Read a SKILL.md file",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "skill_path": {"type": "string"},
+                },
+                "required": ["skill_path"],
+            },
+        },
+    },
 ]
 
 

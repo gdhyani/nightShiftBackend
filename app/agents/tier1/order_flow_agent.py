@@ -8,14 +8,63 @@ AGENT_NAME = "order_flow_agent"
 INSIGHT_TYPE = "order_flow"
 TTL_MINUTES = 5
 
-SYSTEM_PROMPT = """You are an order flow analysis agent for the NightShift trading platform.
-Analyze recent candles for volume imbalances, engulfing patterns, pin bars, absorption signals.
-Respond with JSON: {"volume_imbalance": "bullish"|"bearish"|"neutral", "patterns": ["pattern_at_price"], "absorption_detected": false, "dominant_side": "buyers"|"sellers"|"neutral"}"""
+SYSTEM_PROMPT = (
+    "You are an order flow analysis agent for the NightShift "
+    "trading platform.\n"
+    "Analyze recent candles for volume imbalances, engulfing "
+    "patterns, pin bars, absorption signals.\n"
+    'Respond with JSON: {"volume_imbalance": '
+    '"bullish"|"bearish"|"neutral", '
+    '"patterns": ["pattern_at_price"], '
+    '"absorption_detected": false, '
+    '"dominant_side": "buyers"|"sellers"|"neutral"}'
+)
 
 TOOLS = [
-    {"type": "function", "function": {"name": "read_candles", "description": "Read recent candles", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}, "timeframe": {"type": "string"}, "count": {"type": "integer", "default": 60}}, "required": ["symbol", "timeframe"]}}},
-    {"type": "function", "function": {"name": "read_store", "description": "Read indicator snapshot", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}}, "required": ["symbol"]}}},
-    {"type": "function", "function": {"name": "read_skill", "description": "Read a SKILL.md file", "parameters": {"type": "object", "properties": {"skill_path": {"type": "string"}}, "required": ["skill_path"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "read_candles",
+            "description": "Read recent candles",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                    "timeframe": {"type": "string"},
+                    "count": {"type": "integer", "default": 60},
+                },
+                "required": ["symbol", "timeframe"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_store",
+            "description": "Read indicator snapshot",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                },
+                "required": ["symbol"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_skill",
+            "description": "Read a SKILL.md file",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "skill_path": {"type": "string"},
+                },
+                "required": ["skill_path"],
+            },
+        },
+    },
 ]
 
 

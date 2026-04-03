@@ -4,8 +4,8 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.agents.tier1 import news_agent, order_flow_agent, session_agent, correlation_agent
-from app.agents.tier2 import range_agent, bias_agent, liquidity_agent, structure_agent
+from app.agents.tier1 import correlation_agent, news_agent, order_flow_agent, session_agent
+from app.agents.tier2 import bias_agent, liquidity_agent, range_agent, structure_agent
 from app.core.config import settings
 from app.models import AgentInsight
 
@@ -15,7 +15,10 @@ AGENT_REGISTRY = {
     "news_agent": {"module": news_agent, "interval_attr": "agent_news_interval"},
     "order_flow_agent": {"module": order_flow_agent, "interval_attr": "agent_order_flow_interval"},
     "session_agent": {"module": session_agent, "interval_attr": "agent_session_interval"},
-    "correlation_agent": {"module": correlation_agent, "interval_attr": "agent_correlation_interval"},
+    "correlation_agent": {
+        "module": correlation_agent,
+        "interval_attr": "agent_correlation_interval",
+    },
     "range_agent": {"module": range_agent, "interval_attr": "agent_range_interval"},
     "bias_agent": {"module": bias_agent, "interval_attr": "agent_bias_interval"},
     "liquidity_agent": {"module": liquidity_agent, "interval_attr": "agent_liquidity_interval"},

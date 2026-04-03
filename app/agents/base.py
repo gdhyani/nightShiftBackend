@@ -49,7 +49,10 @@ async def run_agent(
                 if handler:
                     try:
                         result = await handler(**fn_args)
-                        result_str = json.dumps(result) if isinstance(result, (dict, list)) else str(result)
+                        if isinstance(result, (dict, list)):
+                            result_str = json.dumps(result)
+                        else:
+                            result_str = str(result)
                     except Exception as e:
                         result_str = f"Error: {e}"
                 else:

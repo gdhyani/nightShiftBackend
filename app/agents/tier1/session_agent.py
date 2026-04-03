@@ -9,14 +9,60 @@ AGENT_NAME = "session_agent"
 INSIGHT_TYPE = "sessions"
 TTL_MINUTES = 30
 
-SYSTEM_PROMPT = """You are a trading session analyst agent for the NightShift trading platform.
-Track current session, identify killzones, calculate session highs/lows.
-Respond with JSON: {"current_session": "london"|"new_york"|"asia"|"off_hours", "killzone_active": true|false, "session_high": 1.0890, "session_low": 1.0835, "next_session": "new_york", "time_to_next": "3h 15m"}"""
+SYSTEM_PROMPT = (
+    "You are a trading session analyst agent for the NightShift "
+    "trading platform.\n"
+    "Track current session, identify killzones, calculate session "
+    "highs/lows.\n"
+    'Respond with JSON: {"current_session": '
+    '"london"|"new_york"|"asia"|"off_hours", '
+    '"killzone_active": true|false, "session_high": 1.0890, '
+    '"session_low": 1.0835, "next_session": "new_york", '
+    '"time_to_next": "3h 15m"}'
+)
 
 TOOLS = [
-    {"type": "function", "function": {"name": "get_session_info", "description": "Get current trading session info", "parameters": {"type": "object", "properties": {}}}},
-    {"type": "function", "function": {"name": "read_candles", "description": "Read recent candles", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}, "timeframe": {"type": "string"}, "count": {"type": "integer", "default": 20}}, "required": ["symbol", "timeframe"]}}},
-    {"type": "function", "function": {"name": "read_skill", "description": "Read a SKILL.md file", "parameters": {"type": "object", "properties": {"skill_path": {"type": "string"}}, "required": ["skill_path"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "get_session_info",
+            "description": "Get current trading session info",
+            "parameters": {
+                "type": "object",
+                "properties": {},
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_candles",
+            "description": "Read recent candles",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                    "timeframe": {"type": "string"},
+                    "count": {"type": "integer", "default": 20},
+                },
+                "required": ["symbol", "timeframe"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_skill",
+            "description": "Read a SKILL.md file",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "skill_path": {"type": "string"},
+                },
+                "required": ["skill_path"],
+            },
+        },
+    },
 ]
 
 

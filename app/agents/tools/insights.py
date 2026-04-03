@@ -6,7 +6,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import AgentInsight
 
 
-async def read_insights(session: AsyncSession, symbol: str, agent_name: str | None = None) -> list[dict]:
+async def read_insights(
+    session: AsyncSession,
+    symbol: str,
+    agent_name: str | None = None,
+) -> list[dict]:
     now = datetime.now(timezone.utc)
     query = (
         select(AgentInsight)

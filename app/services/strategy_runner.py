@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from datetime import datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -93,7 +92,9 @@ class StrategyRunner:
 
     async def start_strategies(self) -> None:
         async with self._session_factory() as session:
-            result = await session.execute(select(Strategy).where(Strategy.enabled == True))
+            result = await session.execute(
+                select(Strategy).where(Strategy.enabled.is_(True))
+            )
             strategies = result.scalars().all()
         for strategy in strategies:
             task = asyncio.create_task(self.run_strategy_loop(strategy.id))

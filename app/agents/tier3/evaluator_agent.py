@@ -35,8 +35,34 @@ Respond with JSON:
 If decision is WAIT or SKIP, entry_price/stop_loss/take_profit/quantity can be null."""
 
 TOOLS = [
-    {"type": "function", "function": {"name": "read_skill", "description": "Read a SKILL.md file", "parameters": {"type": "object", "properties": {"skill_path": {"type": "string"}}, "required": ["skill_path"]}}},
-    {"type": "function", "function": {"name": "get_open_positions", "description": "Get currently open positions", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}}, "required": []}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "read_skill",
+            "description": "Read a SKILL.md file",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "skill_path": {"type": "string"},
+                },
+                "required": ["skill_path"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "get_open_positions",
+            "description": "Get currently open positions",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                },
+                "required": [],
+            },
+        },
+    },
 ]
 
 
@@ -69,7 +95,11 @@ async def run(session: AsyncSession, symbol: str, analysis: dict) -> dict:
     result = await run_agent(
         name=AGENT_NAME,
         system_prompt=SYSTEM_PROMPT,
-        user_message=f"Evaluate the following analysis for {symbol} and decide whether to execute a trade.\n\nAnalysis:\n{json.dumps(analysis, indent=2)}",
+        user_message=(
+            f"Evaluate the following analysis for {symbol} "
+            "and decide whether to execute a trade.\n\n"
+            f"Analysis:\n{json.dumps(analysis, indent=2)}"
+        ),
         tools=TOOLS,
         tool_handlers=handlers,
     )

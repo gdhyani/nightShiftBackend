@@ -1,8 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.agents.base import run_agent
-from app.agents.tools.market_data import read_candles, read_store
 from app.agents.tools.insights import read_insights
+from app.agents.tools.market_data import read_candles, read_store
 from app.agents.tools.skills import read_skill
 
 AGENT_NAME = "analyst_agent"
@@ -24,10 +24,65 @@ Respond with JSON:
 }"""
 
 TOOLS = [
-    {"type": "function", "function": {"name": "read_candles", "description": "Read recent candles for a symbol and timeframe", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}, "timeframe": {"type": "string"}, "count": {"type": "integer", "default": 50}}, "required": ["symbol", "timeframe"]}}},
-    {"type": "function", "function": {"name": "read_store", "description": "Read store snapshot with indicators", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}}, "required": ["symbol"]}}},
-    {"type": "function", "function": {"name": "read_insights", "description": "Read recent agent insights", "parameters": {"type": "object", "properties": {"symbol": {"type": "string"}, "agent_name": {"type": "string"}}, "required": ["symbol"]}}},
-    {"type": "function", "function": {"name": "read_skill", "description": "Read a SKILL.md file for SMC concepts", "parameters": {"type": "object", "properties": {"skill_path": {"type": "string"}}, "required": ["skill_path"]}}},
+    {
+        "type": "function",
+        "function": {
+            "name": "read_candles",
+            "description": "Read recent candles for a symbol and timeframe",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                    "timeframe": {"type": "string"},
+                    "count": {"type": "integer", "default": 50},
+                },
+                "required": ["symbol", "timeframe"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_store",
+            "description": "Read store snapshot with indicators",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                },
+                "required": ["symbol"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_insights",
+            "description": "Read recent agent insights",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                    "agent_name": {"type": "string"},
+                },
+                "required": ["symbol"],
+            },
+        },
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "read_skill",
+            "description": "Read a SKILL.md file for SMC concepts",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "skill_path": {"type": "string"},
+                },
+                "required": ["skill_path"],
+            },
+        },
+    },
 ]
 
 
@@ -41,7 +96,12 @@ async def run(session: AsyncSession, symbol: str) -> dict:
     result = await run_agent(
         name=AGENT_NAME,
         system_prompt=SYSTEM_PROMPT,
-        user_message=f"Perform a comprehensive market analysis for {symbol}. Read candles on multiple timeframes (H4, H1, M15), check the store snapshot, and review all available agent insights. Apply SMC skills if available.",
+        user_message=(
+            f"Perform a comprehensive market analysis for {symbol}. "
+            "Read candles on multiple timeframes (H4, H1, M15), "
+            "check the store snapshot, and review all available "
+            "agent insights. Apply SMC skills if available."
+        ),
         tools=TOOLS,
         tool_handlers=handlers,
     )

@@ -5,7 +5,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_session
-from app.models import Strategy, StrategyCreate, StrategyUpdate, StrategySchema, StrategyRun, StrategyRunSchema
+from app.models import (
+    Strategy,
+    StrategyCreate,
+    StrategyRun,
+    StrategyRunSchema,
+    StrategySchema,
+    StrategyUpdate,
+)
 
 router = APIRouter(prefix="/api/strategies", tags=["strategies"])
 
@@ -39,7 +46,11 @@ async def get_strategy(strategy_id: int, session: AsyncSession = Depends(get_ses
 
 
 @router.patch("/{strategy_id}", response_model=StrategySchema)
-async def update_strategy(strategy_id: int, data: StrategyUpdate, session: AsyncSession = Depends(get_session)):
+async def update_strategy(
+    strategy_id: int,
+    data: StrategyUpdate,
+    session: AsyncSession = Depends(get_session),
+):
     result = await session.execute(select(Strategy).where(Strategy.id == strategy_id))
     strategy = result.scalar_one_or_none()
     if not strategy:
@@ -53,7 +64,11 @@ async def update_strategy(strategy_id: int, data: StrategyUpdate, session: Async
 
 
 @router.get("/{strategy_id}/runs", response_model=list[StrategyRunSchema])
-async def get_strategy_runs(strategy_id: int, limit: int = 20, session: AsyncSession = Depends(get_session)):
+async def get_strategy_runs(
+    strategy_id: int,
+    limit: int = 20,
+    session: AsyncSession = Depends(get_session),
+):
     result = await session.execute(
         select(StrategyRun).where(StrategyRun.strategy_id == strategy_id)
         .order_by(StrategyRun.created_at.desc()).limit(limit)

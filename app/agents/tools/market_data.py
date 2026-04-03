@@ -15,7 +15,11 @@ async def read_candles(session: AsyncSession, symbol: str, timeframe: str, count
     lines = [f"Candles for {symbol}/{timeframe} (latest {len(candles)}):"]
     lines.append("timestamp | open | high | low | close | volume")
     for c in candles[-20:]:
-        lines.append(f"{c.timestamp.isoformat()} | {c.open:.5f} | {c.high:.5f} | {c.low:.5f} | {c.close:.5f} | {c.volume:.0f}")
+        lines.append(
+            f"{c.timestamp.isoformat()} | {c.open:.5f} | "
+            f"{c.high:.5f} | {c.low:.5f} | "
+            f"{c.close:.5f} | {c.volume:.0f}"
+        )
     return "\n".join(lines)
 
 
