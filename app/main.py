@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.account import router as account_router
 from app.api.agents import router as agents_router
 from app.api.analytics import router as analytics_router
+from app.api.auth import router as auth_router
 from app.api.candles import router as candles_router
 from app.api.indicators import router as indicators_router
 from app.api.reports import router as reports_router
@@ -75,6 +76,7 @@ def create_app() -> FastAPI:
     )
 
     app.include_router(account_router)
+    app.include_router(auth_router)
     app.include_router(agents_router)
     app.include_router(analytics_router)
     app.include_router(candles_router)

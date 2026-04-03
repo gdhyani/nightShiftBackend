@@ -16,7 +16,9 @@ class Instrument(Base):
     __tablename__ = "instruments"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    instrument_key: Mapped[str] = mapped_column(String(100), unique=True, nullable=False, index=True)
+    instrument_key: Mapped[str] = mapped_column(
+        String(100), unique=True, nullable=False, index=True
+    )
     symbol: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
     name: Mapped[str] = mapped_column(String(200), default="")
     exchange: Mapped[str] = mapped_column(String(10), default="")

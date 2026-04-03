@@ -42,7 +42,10 @@ class UpstoxService:
                 "code": code, "client_id": client_id, "client_secret": client_secret,
                 "redirect_uri": redirect_uri, "grant_type": "authorization_code",
             },
-            headers={"Accept": "application/json", "Content-Type": "application/x-www-form-urlencoded"},
+            headers={
+                "Accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded",
+            },
         )
         resp.raise_for_status()
         return resp.json()

@@ -20,9 +20,13 @@ class UserTradingConfig(Base):
     upstox_client_id: Mapped[str] = mapped_column(String(100), default="")
     upstox_client_secret_enc: Mapped[str] = mapped_column(Text, default="")
     daily_token_enc: Mapped[str] = mapped_column(Text, default="")
-    daily_token_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    daily_token_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     sandbox_token_enc: Mapped[str] = mapped_column(Text, default="")
-    sandbox_token_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    sandbox_token_expires_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
     default_mode: Mapped[str] = mapped_column(String(10), default="paper")
     notifier_url: Mapped[str] = mapped_column(Text, default="")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_utcnow)
