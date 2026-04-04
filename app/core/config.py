@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     upstox_notifier_url: str = (
         "http://localhost:8000/api/webhooks/upstox/token"
     )
+    upstox_postback_url: str = (
+        "http://localhost:8000/api/webhooks/upstox/orders"
+    )
     upstox_sandbox_token: str = ""
     upstox_api_base_url: str = "https://api.upstox.com"
 
