@@ -2,8 +2,9 @@ import logging
 from datetime import datetime, timedelta, timezone
 from urllib.parse import urlencode
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -164,3 +165,30 @@ async def update_sandbox_token(
     expires_at = datetime.now(timezone.utc) + timedelta(days=body.expires_in_days)
     await tm.store_sandbox_token(session, "default", body.token, expires_at)
     return {"status": "ok", "expires_at": expires_at.isoformat()}
+
+
+@router.post("/api/webhooks/upstox/orders")
+async def webhook_order_update(
+    request: Request,
+    session: AsyncSession = Depends(get_session),
+):
+    body = await request.json()
+    order_id = body.get("order_id")
+    status = body.get("status")
+    if order_id and status:
+        from app.models import Trade
+        result = await session.execute(
+            select(Trade).where(Trade.id == int(order_id))
+        )
+        trade = result.scalar_one_or_none()
+        if trade:
+            if status in ("complete", "filled"):
+                trade.status = "open"
+                avg_price = body.get("average_price")
+                if avg_price:
+                    trade.entry_price = float(avg_price)
+            elif status in ("rejected", "cancelled"):
+                trade.status = "cancelled"
+            await session.commit()
+        logger.info(f"Order webhook: {order_id} -> {status}")
+    return {"status": "ok"}
