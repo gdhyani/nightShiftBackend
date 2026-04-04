@@ -25,6 +25,7 @@ class Trade(Base):
     take_profit: Mapped[float] = mapped_column(Float, nullable=False)
     quantity: Mapped[float] = mapped_column(Float, nullable=False)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="pending")
+    source: Mapped[str] = mapped_column(String(20), nullable=False, default="paper")
     pnl: Mapped[float | None] = mapped_column(Float, nullable=True)
     reasoning: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     opened_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
@@ -45,6 +46,7 @@ class TradeSchema(BaseModel):
     take_profit: float
     quantity: float
     status: str
+    source: str
     pnl: float | None
     reasoning: dict[str, Any] | None
     opened_at: datetime | None
