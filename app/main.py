@@ -15,6 +15,7 @@ from app.api.indicators import router as indicators_router
 from app.api.instruments import router as instruments_router
 from app.api.market import router as market_router
 from app.api.orders import router as orders_router
+from app.api.portfolio import router as portfolio_router
 from app.api.reports import router as reports_router
 from app.api.skills_api import router as skills_router
 from app.api.store import router as store_router
@@ -123,6 +124,7 @@ def create_app() -> FastAPI:
     app.include_router(instruments_router)
     app.include_router(market_router)
     app.include_router(orders_router)
+    app.include_router(portfolio_router)
     app.include_router(reports_router)
     app.include_router(skills_router)
     app.include_router(store_router)
