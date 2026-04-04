@@ -70,6 +70,21 @@ async def lifespan(app: FastAPI):
         ingest_task = asyncio.create_task(_ingest_loop())
         logger.info("Upstox candle ingestion started")
 
+    scheduler = None
+    if settings.upstox_client_id:
+        from app.services.instrument_service import InstrumentService
+        from app.services.scheduler import NightShiftScheduler
+        scheduler = NightShiftScheduler(
+            session_factory=async_session,
+            upstox=UpstoxService(
+                base_url=settings.upstox_api_base_url,
+            ),
+            token_manager=TokenManager(encryption_key=_enc_key),
+            instrument_service=InstrumentService(),
+        )
+        scheduler.start()
+        logger.info("Scheduler started")
+
     agent_runner = None
     if settings.llm_api_key:
         from app.services.agent_runner import AgentRunner
@@ -90,6 +105,8 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
+    if scheduler:
+        scheduler.stop()
     if ingest_task:
         ingest_task.cancel()
     if strategy_runner_svc:
