@@ -10,9 +10,11 @@ from app.api.agents import router as agents_router
 from app.api.analytics import router as analytics_router
 from app.api.auth import router as auth_router
 from app.api.candles import router as candles_router
+from app.api.charges import router as charges_router
 from app.api.indicators import router as indicators_router
 from app.api.instruments import router as instruments_router
 from app.api.market import router as market_router
+from app.api.orders import router as orders_router
 from app.api.reports import router as reports_router
 from app.api.skills_api import router as skills_router
 from app.api.store import router as store_router
@@ -116,9 +118,11 @@ def create_app() -> FastAPI:
     app.include_router(agents_router)
     app.include_router(analytics_router)
     app.include_router(candles_router)
+    app.include_router(charges_router)
     app.include_router(indicators_router)
     app.include_router(instruments_router)
     app.include_router(market_router)
+    app.include_router(orders_router)
     app.include_router(reports_router)
     app.include_router(skills_router)
     app.include_router(store_router)

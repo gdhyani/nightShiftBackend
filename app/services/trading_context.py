@@ -1,11 +1,8 @@
 import logging
+
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.models import Position
-from app.services.charge_calculator import ChargeCalculator
-from app.services.paper_engine import PaperEngine
-from app.services.token_manager import TokenManager
-from app.services.upstox import UpstoxService
 from app.services.upstox_order_service import UpstoxOrderService
 
 logger = logging.getLogger(__name__)

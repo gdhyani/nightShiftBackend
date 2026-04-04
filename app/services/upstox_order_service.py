@@ -1,4 +1,5 @@
 import logging
+
 from app.services.upstox import UpstoxService
 
 logger = logging.getLogger(__name__)
